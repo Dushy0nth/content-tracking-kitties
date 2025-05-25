@@ -691,6 +691,7 @@
 
         // Initialize app
         function init() {
+            loadAllTasksFromSheet();
             createFloatingHearts();
             generateRoomCode();
             updateCurrentDate();
@@ -838,6 +839,7 @@
             }
 
             dailyProgress[dateStr][type] = !dailyProgress[dateStr][type];
+            saveTaskToSheet(schedule[type], dailyProgress[dateStr][type]);
             loadDayContent();
             
             // Update friends progress (simulate for demo)
@@ -849,3 +851,4 @@
             if (event.key === 'Enter') {
                 addCustomTask();
             }
+            ✨ Replace with updated version (Google Sheets synced)
