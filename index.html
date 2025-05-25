@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐾 Content Tracking Kitties</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #ff9ff3 0%, #feca57 50%, #ff6b9d 100%);
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Floating hearts animation */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            color: #ff69b4;
+            font-size: 20px;
+            animation: float 6s ease-in-out infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.7; }
+            90% { opacity: 0.7; }
+            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+        }
+
+        /* Cat decorations */
+        .cat-decoration {
+            position: absolute;
+            font-size: 40px;
+            z-index: 2;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        .cat-1 { top: 10%; left: 5%; }
+        .cat-2 { top: 30%; right: 5%; }
+        .cat-3 { bottom: 20%; left: 10%; }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(255, 105, 180, 0.3);
+            overflow: hidden;
+            position: relative;
+            z-index: 3;
+            border: 3px solid #ff69b4;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff6b9d, #ff8fab);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 15px;
+        }
+
+        .room-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .room-code {
+            background: rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .goal-badge {
+            background: rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav {
+            display: flex;
+            background: #ffeef8;
+            border-bottom: 3px solid #ff69b4;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            color: #ff1493;
+            font-family: 'Comic Sans MS', cursive;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 105, 180, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: white;
+            color: #ff1493;
+            box-shadow: 0 -3px 10px rgba(255, 105, 180, 0.3);
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 500px;
+            background: linear-gradient(to bottom, #fff5f8, #ffffff);
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #ff9ff3, #feca57);
+            padding: 20px;
+            border-radius: 20px;
+            color: white;
+        }
+
+        .nav-arrow {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            font-size: 16px;
+        }
+
+        .nav-arrow:hover {
+            background: rgba(255,255,255,0.5);
+            transform: scale(1.05);
+        }
+
+        .nav-arrow:active {
+            animation: heartGlow 0.4s ease;
+        }
+
+        @keyframes heartGlow {
+            0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+            50% { 
+                box-shadow: 0 0 0 20px rgba(255, 105, 180, 0.2), 
+                           0 0 30px rgba(255, 20, 147, 0.8);
+                transform: scale(1.05);
+            }
+            100% { 
+                box-shadow: 0 0 0 40px rgba(255, 105, 180, 0);
+                transform: scale(1);
+            }
+        }
+
+        .current-date {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .today-tasks {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .task-card {
+            background: linear-gradient(135deg, #fff0f8, #ffffff);
+            border: 3px solid #ffcceb;
+            border-radius: 25px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .task-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(255, 105, 180, 0.2);
+        }
+
+        .task-card.completed {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            border-color: #28a745;
+        }
+
+        .task-card h3 {
+            color: #ff1493;
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .task-card.completed h3 {
+            color: #28a745;
+        }
+
+        .task-description {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .task-btn {
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', cursive;
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.3);
+            width: 100%;
+        }
+
+        .task-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(255, 105, 180, 0.4);
+        }
+
+        .task-btn:active {
+            animation: heartGlow 0.6s ease;
+        }
+
+        .task-btn.completed {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+
+        .custom-task-section {
+            background: linear-gradient(135deg, #fff0f8, #ffffff);
+            border: 2px solid #ffcceb;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .custom-task-title {
+            color: #ff1493;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .task-input {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .task-input input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #ff69b4;
+            border-radius: 20px;
+            font-size: 16px;
+            font-family: 'Comic Sans MS', cursive;
+            background: rgba(255, 240, 248, 0.8);
+            transition: all 0.3s ease;
+        }
+
+        .task-input input:focus {
+            outline: none;
+            border-color: #ff1493;
+            box-shadow: 0 0 15px rgba(255, 105, 180, 0.3);
+            background: white;
+        }
+
+        .add-btn {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #ff69b4, #ff1493);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Comic Sans MS', cursive;
+            box-shadow: 0 8px 15px rgba(255, 105, 180, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(255, 105, 180, 0.4);
+        }
+
+        .add-btn:active {
+            animation: heartGlow 0.6s ease;
+        }
+
+        .custom-tasks-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .custom-task-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 105, 180, 0.1);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .custom-task-item:hover {
+            background: rgba(255, 105, 180, 0.2);
+            transform: translateX(5px);
+        }
+
+        .custom-task-text {
+            flex: 1;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .custom-task-text.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+            color: #999;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #ff69b4;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Comic Sans MS', cursive;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .friends-tracker {
+            background: linear-gradient(135deg, #ff9ff3, #feca57);
+            border-radius: 20px;
+            padding: 25px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .friends-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .friends-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .friend-card {
+            background: rgba(255,255,255,0.2);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+
+        .friend-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .friend-points {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .friend-status {
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .status-completed {
+            background: rgba(40, 167, 69, 0.8) !important;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.8) !important;
+        }
+
+        .status-missed {
+            background: rgba(220, 53, 69, 0.8) !important;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .history-item {
+            background: linear-gradient(135deg, #fff0f8, #ffffff);
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 2px solid #ffcceb;
+            box-shadow: 0 5px 15px rgba(255, 105, 180, 0.1);
+        }
+
+        .history-date {
+            font-weight: bold;
+            color: #ff1493;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .history-tasks {
+            font-size: 14px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 20px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .today-tasks {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .friends-table {
+                grid-template-columns: 1fr;
+            }
+            
+            .room-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .calendar-nav {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .task-input {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating hearts -->
+    <div class="floating-hearts" id="floatingHearts"></div>
+    
+    <!-- Cat decorations -->
+    <div class="cat-decoration cat-1">🐱</div>
+    <div class="cat-decoration cat-2">😸</div>
+    <div class="cat-decoration cat-3">😻</div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🐾 Content Tracking Kitties 💖</h1>
+            <div class="room-info">
+                <div class="room-code">🏠 Room: <span id="roomCode">ABC123</span></div>
+                <div class="goal-badge">🎯 Goal: 30K+ Followers</div>
+                <div class="goal-badge">📅 May 26 - Sep 25</div>
+            </div>
+        </div>
+
+        <div class="nav">
+            <button class="nav-btn active" data-tab="today">Today's Tasks 💕</button>
+            <button class="nav-btn" data-tab="history">Monthly History 📚</button>
+        </div>
+
+        <div class="content">
+            <div id="todayTab" class="tab-content active">
+                <div class="calendar-nav">
+                    <button class="nav-arrow" onclick="changeDate(-1)">💕 Previous Day</button>
+                    <div class="current-date" id="currentDate"></div>
+                    <button class="nav-arrow" onclick="changeDate(1)">Next Day 💕</button>
+                </div>
+
+                <div class="today-tasks">
+                    <div class="task-card" id="shortVideoCard">
+                        <h3>📱 Short Form Content</h3>
+                        <div class="task-description" id="shortVideoDesc">Create and post a short video</div>
+                        <button class="task-btn" id="shortVideoBtn" onclick="toggleDailyTask('short')">
+                            ✨ Mark as Complete ✨
+                        </button>
+                    </div>
+
+                    <div class="task-card" id="longVideoCard">
+                        <h3>🎬 Long Form Content</h3>
+                        <div class="task-description" id="longVideoDesc">No long video scheduled today</div>
+                        <button class="task-btn" id="longVideoBtn" onclick="toggleDailyTask('long')" disabled style="opacity: 0.5;">
+                            Not Scheduled Today
+                        </button>
+                    </div>
+                </div>
+
+                <div class="custom-task-section">
+                    <div class="custom-task-title">
+                        <span>✨</span>
+                        <span>Additional Custom Tasks</span>
+                        <span>🌟</span>
+                    </div>
+                    <div class="task-input">
+                        <input type="text" id="customTaskInput" placeholder="Add a custom task... 🌸" onkeypress="handleKeyPress(event)">
+                        <button class="add-btn" onclick="addCustomTask()">✨ Add Task</button>
+                    </div>
+                    <div class="custom-tasks-list" id="customTasksList"></div>
+                </div>
+
+                <div class="friends-tracker">
+                    <div class="friends-title">👥 Friends Progress Tracker</div>
+                    <div class="friends-table">
+                        <div class="friend-card">
+                            <div class="friend-name">Yaplof</div>
+                            <div class="friend-points"><span id="yaplopPoints">0</span> 🏆</div>
+                            <div class="friend-status" id="yaplopStatus">Today: Pending</div>
+                        </div>
+                        <div class="friend-card">
+                            <div class="friend-name">Arseiz</div>
+                            <div class="friend-points"><span id="arseizPoints">0</span> 🏆</div>
+                            <div class="friend-status" id="arseizStatus">Today: Pending</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="historyTab" class="tab-content">
+                <div class="calendar-nav">
+                    <button class="nav-arrow" onclick="changeHistoryMonth(-1)">💕 Previous Month</button>
+                    <div class="current-date" id="currentHistoryMonth"></div>
+                    <button class="nav-arrow" onclick="changeHistoryMonth(1)">Next Month 💕</button>
+                </div>
+                <div id="historyContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentDate = new Date();
+        let currentHistoryDate = new Date();
+        let customTasks = [];
+        let dailyProgress = {};
+        let friendsProgress = {
+            yaplof: { points: 0, todayCompleted: false },
+            arseiz: { points: 0, todayCompleted: false }
+        };
+
+        // Content schedule data (first month)
+        const contentSchedule = {
+            "2025-05-26": { short: "Short Video 1", long: "Long Video 1" },
+            "2025-05-27": { short: "Short Video 2", long: "" },
+            "2025-05-28": { short: "Short Video 3", long: "" },
+            "2025-05-29": { short: "Short Video 4", long: "" },
+            "2025-05-30": { short: "Short Video 5", long: "Long Video 2" },
+            "2025-05-31": { short: "Short Video 6", long: "" },
+            "2025-06-01": { short: "Short Video 7", long: "" },
+            "2025-06-02": { short: "Short Video 8", long: "" },
+            "2025-06-03": { short: "Short Video 9", long: "Long Video 3" },
+            "2025-06-04": { short: "Short Video 10", long: "" },
+            "2025-06-05": { short: "Short Video 11", long: "" },
+            "2025-06-06": { short: "Short Video 12", long: "" },
+            "2025-06-07": { short: "Short Video 13", long: "Long Video 4" },
+            "2025-06-08": { short: "Short Video 14", long: "" },
+            "2025-06-09": { short: "Short Video 15", long: "" },
+            "2025-06-10": { short: "Short Video 16", long: "" },
+            "2025-06-11": { short: "Short Video 17", long: "Long Video 5" },
+            "2025-06-12": { short: "Short Video 18", long: "" },
+            "2025-06-13": { short: "Short Video 19", long: "" },
+            "2025-06-14": { short: "Short Video 20", long: "" },
+            "2025-06-15": { short: "Short Video 21", long: "Long Video 6" },
+            "2025-06-16": { short: "Short Video 22", long: "" },
+            "2025-06-17": { short: "Short Video 23", long: "" },
+            "2025-06-18": { short: "Short Video 24", long: "" },
+            "2025-06-19": { short: "Short Video 25", long: "Long Video 7" },
+            "2025-06-20": { short: "Short Video 26", long: "" },
+            "2025-06-21": { short: "Short Video 27", long: "" },
+            "2025-06-22": { short: "Short Video 28", long: "" },
+            "2025-06-23": { short: "Short Video 29", long: "Long Video 8" },
+            "2025-06-24": { short: "Short Video 30", long: "" },
+            "2025-06-25": { short: "Short Video 31", long: "" }
+        };
+
+        // Initialize floating hearts
+        function createFloatingHearts() {
+            const heartsContainer = document.getElementById('floatingHearts');
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.innerHTML = ['💖', '💕', '💗', '🌸'][Math.floor(Math.random() * 4)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                heartsContainer.appendChild(heart);
+                
+                setTimeout(() => {
+                    heart.remove();
+                }, 6000);
+            }, 2000);
+        }
+
+        // Initialize app
+        function init() {
+            createFloatingHearts();
+            generateRoomCode();
+            updateCurrentDate();
+            updateCurrentHistoryMonth();
+            loadDayContent();
+            renderCustomTasks();
+            updateFriendsDisplay();
+            setupNavigation();
+        }
+
+        // Setup navigation
+        function setupNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const tabName = this.getAttribute('data-tab');
+                    showTab(tabName, this);
+                });
+            });
+        }
+
+        // Show tab function
+        function showTab(tabName, clickedBtn) {
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            clickedBtn.classList.add('active');
+
+            // Show/hide content
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            if (tabName === 'today') {
+                document.getElementById('todayTab').classList.add('active');
+            } else if (tabName === 'history') {
+                document.getElementById('historyTab').classList.add('active');
+                renderHistory();
+            }
+        }
+
+        // Generate random room code
+        function generateRoomCode() {
+            const code = Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('roomCode').textContent = code;
+        }
+
+        // Update current date display
+        function updateCurrentDate() {
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('en-US', options);
+        }
+
+        // Update current history month display
+        function updateCurrentHistoryMonth() {
+            const options = { year: 'numeric', month: 'long' };
+            document.getElementById('currentHistoryMonth').textContent = currentHistoryDate.toLocaleDateString('en-US', options);
+        }
+
+        // Change date
+        function changeDate(direction) {
+            currentDate.setDate(currentDate.getDate() + direction);
+            updateCurrentDate();
+            loadDayContent();
+        }
+
+        // Change history month
+        function changeHistoryMonth(direction) {
+            currentHistoryDate.setMonth(currentHistoryDate.getMonth() + direction);
+            updateCurrentHistoryMonth();
+            renderHistory();
+        }
+
+        // Load content for current day
+        function loadDayContent() {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const schedule = contentSchedule[dateStr];
+            
+            const shortCard = document.getElementById('shortVideoCard');
+            const longCard = document.getElementById('longVideoCard');
+            const shortBtn = document.getElementById('shortVideoBtn');
+            const longBtn = document.getElementById('longVideoBtn');
+            const shortDesc = document.getElementById('shortVideoDesc');
+            const longDesc = document.getElementById('longVideoDesc');
+
+            // Check if tasks are completed for this date
+            const dayProgress = dailyProgress[dateStr] || { short: false, long: false };
+
+            // Short video (always available)
+            if (schedule && schedule.short) {
+                shortDesc.textContent = `Create: ${schedule.short}`;
+            } else {
+                shortDesc.textContent = "Create and post a short video";
+            }
+
+            if (dayProgress.short) {
+                shortCard.classList.add('completed');
+                shortBtn.textContent = '✅ Completed!';
+                shortBtn.classList.add('completed');
+            } else {
+                shortCard.classList.remove('completed');
+                shortBtn.textContent = '✨ Mark as Complete ✨';
+                shortBtn.classList.remove('completed');
+            }
+
+            // Long video (only on scheduled days)
+            if (schedule && schedule.long) {
+                longDesc.textContent = `Create: ${schedule.long}`;
+                longBtn.disabled = false;
+                longBtn.style.opacity = '1';
+                
+                if (dayProgress.long) {
+                    longCard.classList.add('completed');
+                    longBtn.textContent = '✅ Completed!';
+                    longBtn.classList.add('completed');
+                } else {
+                    longCard.classList.remove('completed');
+                    longBtn.textContent = '✨ Mark as Complete ✨';
+                    longBtn.classList.remove('completed');
+                }
+            } else {
+                longDesc.textContent = "No long video scheduled today";
+                longBtn.disabled = true;
+                longBtn.style.opacity = '0.5';
+                longBtn.textContent = 'Not Scheduled Today';
+                longCard.classList.remove('completed');
+                longBtn.classList.remove('completed');
+            }
+        }
+
+        // Toggle daily task completion
+        function toggleDailyTask(type) {
+            const dateStr = currentDate.toISOString().split('T')[0];
+            const schedule = contentSchedule[dateStr];
+            
+            if (type === 'long' && (!schedule || !schedule.long)) {
+                return; // Can't complete non-scheduled long videos
+            }
+
+            if (!dailyProgress[dateStr]) {
+                dailyProgress[dateStr] = { short: false, long: false };
+            }
+
+            dailyProgress[dateStr][type] = !dailyProgress[dateStr][type];
+            loadDayContent();
+            
+            // Update friends progress (simulate for demo)
+            updateFriendsProgress();
+        }
+
+        // Handle keyboard input for custom tasks
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                addCustomTask();
+            }
